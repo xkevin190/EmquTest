@@ -11,14 +11,11 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 import { AsyncStorage } from "react-native";
-import { setData } from "../firebase/index";
 
 const initialValues = {
   username: "",
   password: ""
 };
-
-const auth = new setData();
 
 export default class Equilibrio extends Component {
   constructor(props) {

@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import Login from "./LoginScreen";
-import { setData } from "../firebase/index";
 import { connect } from "react-redux";
-import { login, register, loaded } from "../actions/setActions";
-import { Text } from "react-native";
+import { login, register, loaded, getliveData } from "../actions/setActions";
+import Home from './Home'
 
-
-const auth = new setData();
 
 class DualComponent extends Component {
   constructor(props) {
@@ -14,6 +11,11 @@ class DualComponent extends Component {
     this.state = {
       login: false
     };
+  }
+
+  componentDidMount= ()=>{
+    console.log("ejecuto")
+    this.props.getliveData()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -25,12 +27,11 @@ class DualComponent extends Component {
   };
 
   render() {
-    console.log(this.props)
+    console.log("loaded", this.props.userLoaded)
     return (
       <>
         {!this.props.userLoaded && <Login {...this.props} />}
-
-        {this.props.userLoaded  && <Text>hello word</Text>}
+        {this.props.userLoaded  && <Home match={this.props.match}/>}
       </>
     );
   }
@@ -38,7 +39,8 @@ class DualComponent extends Component {
 
 const mapStateToProps = state => ({
   userLoaded: state.init.loaded,
-  loading: state.init.loading
+  loading: state.init.loading,
+  match: state.init.match
 });
 const mapDispatchToProps = dispatch => ({
   login: (values, navigation, callback) => {
@@ -46,7 +48,8 @@ const mapDispatchToProps = dispatch => ({
   },
   register: (values, navigation, callback) =>
     dispatch(register(values, navigation, callback)),
-  loaded: () => dispatch(loaded())
+  loaded: () => dispatch(loaded()),
+  getliveData: ()=>dispatch(getliveData())
 });
 
 export default connect(

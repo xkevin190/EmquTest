@@ -5,14 +5,6 @@ import ReduxThunk from 'redux-thunk';
 import rootReducer from './reducers/rootReducer';
 import logger from 'redux-logger'
 
-const enhancerList = [];
-const devToolsExtension = window && window.__REDUX_DEVTOOLS_EXTENSION__;
-
-if (typeof devToolsExtension === 'function') {
-  enhancerList.push(devToolsExtension());
-}
-
-//const composedEnhancer = compose( applyMiddleware(logger), ...enhancerList);
 
 const middleWare = applyMiddleware( ReduxThunk,logger)(createStore);
 

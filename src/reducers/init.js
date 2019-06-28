@@ -12,22 +12,20 @@ setList = (state, node, payload) => {
 
 resetAll = (state, node) => state.set(node, Map());
 
-
 const InitialState = {
-  loaded:false,
-  loading: false
-}
+  loaded: false,
+  loading: false,
+  match:[]
+};
 
 const test = (state = InitialState, action) => {
   switch (action.type) {
-    // case "SETSTATE": {
-    //   return this.setState(state, action.payload);
-    // }
-    // case "LOGOUT": {
-    //   return setdata(state, "logout", action.users);
-    // }
     case "VERIFYING": {
-      return { state, ...action.payload };
+      return { ...state, ...action.payload };
+    }
+
+    case "LIVE_MATCH": {
+      return { ...state, match: action.payload };
     }
 
     default:
