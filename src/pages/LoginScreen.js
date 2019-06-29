@@ -11,6 +11,7 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 import { AsyncStorage } from "react-native";
+import { banderas, noPhoto, data } from "../state/banderas";
 
 const initialValues = {
   username: "",
@@ -28,6 +29,7 @@ export default class Equilibrio extends Component {
 
   componentDidMount() {
     this.props.loaded();
+    // this.setLocalStorage();
   }
 
   handleTest = async () => {
@@ -89,6 +91,10 @@ export default class Equilibrio extends Component {
       }, 1);
     }
   }
+
+  setLocalStorage = async () => {
+    await AsyncStorage.setItem("match", JSON.stringify(data.match));
+  };
 
   render() {
     let validationSchema;

@@ -16,32 +16,78 @@ import {
   View
 } from "native-base";
 import { StyleSheet, AsyncStorage, Image } from "react-native";
-import { banderas } from "../state/banderas";
+import { banderas, noPhoto, data } from "../state/banderas";
 
 export default class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      match: []
+    };
   }
 
   getResult = match => {
     const result = match.score.split(" ");
 
     return {
-      homeScore: result[0],
-      awayScore: result[2]
+      homeScore: result[0] === "?" ? "0" : result[0],
+      awayScore: result[2] === "?" ? "0" : result[2]
     };
   };
 
-  getLocalStorage = async () => {
-    const res = await AsyncStorage.getItem("match");
-    const result = JSON.parse(res);
+  componentDidMount = () => {
+    this.getLocalStorage();
+  };
 
-    console.log("!!!!!!!!!!!!!!!!!!!", result);
+  getLocalStorage = () => {
+    AsyncStorage.getItem("match", (err, result) => {
+      console.log("asdasd", JSON.parse(result));
+      this.setState({ match: JSON.parse(result) });
+    });
+  };
+
+  // setLocalStorage = async () => {
+  //   console.log("nuevos datos", data.match);
+  //   const res = await AsyncStorage.getItem("match");
+  //   const parse = JSON.parse(res);
+
+  //   parse.push(...data.match);
+
+  //   await AsyncStorage.setItem("match", JSON.stringify(parse));
+  // };
+
+  getFecha = date => {
+    const options = {
+      weekday: "long",
+      day: "numeric",
+      month: "short"
+    };
+    return new Date(date).toLocaleDateString("es-ES", options);
+  };
+
+  getGroups = values => {
+    const arrayGroup = [];
+    values.map(match => {
+      const result = arrayGroup.find(
+        group => group === this.getFecha(match.date)
+      );
+      if (!result) {
+        arrayGroup.push(match.date);
+      }
+    });
+
+    return arrayGroup.sort((a, b) => {
+      return new Date(b) - new Date(a);
+    });
   };
 
   render() {
-    this.getLocalStorage();
+    const matchs =
+      this.props.match.length === 0 ? this.state.match : this.props.match;
+
+    const groups = this.getGroups(matchs);
+
+    console.log("MarditaSeaaa", groups);
     return (
       <Container>
         <Header style={styles.Header}>
@@ -76,75 +122,132 @@ export default class Home extends Component {
               }
             >
               <View style={{ backgroundColor: "#2979ff", height: 50 }} />
-
-              <View style={styles.FechaContainer}>
-                <Text style={{ color: "#fff", fontSize: 14 }}>
-                  {" "}
-                  jueves 27 de junio
-                </Text>
-              </View>
-              {this.props.match.map((match, key) => {
-                const score = this.getResult(match);
-                console.log("score", banderas[match.home_name]);
+              {groups.map((group, key) => {
                 return (
-                  <View
-                    key={key}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderBottomWidth: 0.5
-                    }}
-                  >
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center"
-                      }}
-                    >
-                      <Image
-                        source={banderas[match.home_name].url}
-                        style={{ width: 30, height: 30, marginHorizontal: 10 }}
-                      />
-                      <Text>{match.home_name}</Text>
-                    </View>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        minHeight: 60
-                      }}
-                    >
-                      <Text style={{ fontSize: 20 }}>{score.homeScore}</Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          paddingHorizontal: 10
-                        }}
-                      >
-                        {match.status === "IN PLAY" ? "live" : "--"}
+                  <View key={key}>
+                    <View style={styles.FechaContainer}>
+                      <Text style={{ color: "#fff", fontSize: 14 }}>
+                        {" "}
+                        {this.getFecha(group)}
                       </Text>
-                      <View>
-                        <Text style={{ fontSize: 20 }}>{score.awayScore}</Text>
-                      </View>
                     </View>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center"
-                      }}
-                    >
-                      <Text>{match.away_name}</Text>
-                      <Image
-                        source={banderas[match.away_name].url}
-                        style={{ width: 30, height: 30, marginHorizontal: 10 }}
-                      />
-                    </View>
+                    {matchs.map((match, key) => {
+                      const score = this.getResult(match);
+                      if (this.getFecha(match.date) === this.getFecha(group))
+                        return (
+                          <View
+                            key={key}
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              borderBottomWidth: 0.5
+                            }}
+                          >
+                            <View
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                flex: 1
+                              }}
+                            >
+                              <Image
+                                source={
+                                  banderas[match.home_name]
+                                    ? banderas[match.home_name].url
+                                    : noPhoto.url
+                                }
+                                style={{
+                                  width: 30,
+                                  height: 30,
+                                  marginRight: 10,
+                                  marginLeft: 20
+                                }}
+                              />
+                              <Text style={{ maxWidth: "68%" }}>
+                                {match.home_name}
+                              </Text>
+                            </View>
+                            <View
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                minHeight: 60,
+                                flex: 0.5,
+                                paddingHorizontal: 10
+                              }}
+                            >
+                              <Text style={{ fontSize: 20 }}>
+                                {score.homeScore}
+                              </Text>
+                              {match.status === "IN PLAY" && (
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                    paddingHorizontal: 10,
+                                    color: "#4caf50",
+                                    fontWeight: "bold"
+                                  }}
+                                >
+                                  Live
+                                </Text>
+                              )}
+
+                              {match.status !== "IN PLAY" && (
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                    paddingHorizontal: 17,
+                                    color: "#4caf50"
+                                  }}
+                                >
+                                  --
+                                </Text>
+                              )}
+                              <View
+                                style={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  flexDirection: "row"
+                                }}
+                              >
+                                <Text style={{ fontSize: 20 }}>
+                                  {score.awayScore}
+                                </Text>
+                              </View>
+                            </View>
+                            <View
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                flex: 1,
+                                justifyContent: "flex-end"
+                              }}
+                            >
+                              <Text style={{ maxWidth: "68%" }}>
+                                {match.away_name}
+                              </Text>
+                              <Image
+                                source={
+                                  banderas[match.away_name]
+                                    ? banderas[match.away_name].url
+                                    : noPhoto.url
+                                }
+                                style={{
+                                  width: 30,
+                                  height: 30,
+                                  marginRight: 20,
+                                  marginLeft: 10
+                                }}
+                              />
+                            </View>
+                          </View>
+                        );
+                    })}
                   </View>
                 );
               })}

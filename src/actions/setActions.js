@@ -18,6 +18,8 @@ export const loading = () => {
 export const login = (values, cb) => async dispatch => {
   const res = await AsyncStorage.getItem("user");
   const result = JSON.parse(res);
+  console.log(values);
+  console.log(result);
   if (
     result.username === values.username &&
     result.password === values.password
@@ -44,20 +46,42 @@ export const register = (values, cb) => async dispatch => {
   }
 };
 
-export const getliveData = () => async dispatch => {
+verifyStorage = async matchs => {
+  const res = await AsyncStorage.getItem("match");
+  const parse = JSON.parse(res);
+  if (matchs.lenth === 0) {
+    console.log("entro en el 0");
+    return parse;
+  }
+  matchs.map(match => {
+    if (parse) {
+      const index = parse.findIndex(storage => storage.id === match.id);
+      if (index === -1) {
+        parse.push({ ...match, date: new Date() });
+      } else {
+        parse[index] = { ...match, date: new Date() };
+      }
+    }
+  });
+
+  await AsyncStorage.setItem("match", JSON.stringify(parse));
+
+  return parse;
+};
+
+export const getliveData = () => dispatch => {
   setInterval(() => {
     axios
       .get(urlLive)
-      .then(res => {
-        AsyncStorage.setItem("match", JSON.stringify(res.data.data.match));
-
+      .then(async res => {
+        const result = await this.verifyStorage(res.data.data.match);
         dispatch({
           type: "LIVE_MATCH",
-          payload: res.data.data.match
+          payload: result
         });
       })
       .catch(err => {
         console.log(err);
       });
-  }, 10000);
+  }, 20000);
 };

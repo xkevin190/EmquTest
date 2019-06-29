@@ -1,0 +1,43 @@
+{
+  "success": true,
+  "data": {
+    "match": [
+      {
+        "away_name": "Argentina",
+        "last_changed": "2019-06-28 20:58:01",
+        "added": "2019-06-27 18:45:06",
+        "status": "FINISHED",
+        "league_name": "Quarter Finals",
+        "ht_score": "0 - 1",
+        "time": "FT",
+        "away_id": 1443,
+        "events": "https://livescore-api.com/api-client/scores/events.json?key=ykBg0rnFwIS6pynm&amp;secret=yTkQJWmbgo397jzGDbXECkk83dfsLDOk&amp;id=147702",
+        "ft_score": "0 - 2",
+        "home_name": "Venezuela",
+        "league_id": 963,
+        "id": 147702,
+        "et_score": "",
+        "score": "0 - 2",
+        "home_id": 1850
+      },
+      {
+        "away_name": "Peru",
+        "last_changed": "2019-06-27 20:12:01",
+        "added": "2019-06-27 18:02:06",
+        "status": "FINISHED",
+        "league_name": "Quarter Finals",
+        "ht_score": "0 - 1",
+        "time": "FT",
+        "away_id": 1443,
+        "events": "https://livescore-api.com/api-client/scores/events.json?key=ykBg0rnFwIS6pynm&amp;secret=yTkQJWmbgo397jzGDbXECkk83dfsLDOk&amp;id=147702",
+        "ft_score": "0 - 2",
+        "home_name": "Japon",
+        "league_id": 963,
+        "id": 147702,
+        "et_score": "",
+        "score": "0 - 2",
+        "home_id": 1850
+      }
+    ]
+  }
+}
