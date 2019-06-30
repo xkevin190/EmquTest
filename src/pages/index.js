@@ -1,9 +1,14 @@
 import React, { Component } from "react";
 import Login from "./LoginScreen";
 import { connect } from "react-redux";
-import { login, register, loaded, getliveData } from "../actions/setActions";
-import Home from './Home'
-
+import {
+  login,
+  register,
+  loaded,
+  getliveData,
+  sesionOff
+} from "../actions/setActions";
+import Home from "./Home";
 
 class DualComponent extends Component {
   constructor(props) {
@@ -13,25 +18,22 @@ class DualComponent extends Component {
     };
   }
 
-  componentDidMount= ()=>{
-    console.log("ejecuto")
-    this.props.getliveData()
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.forceUpdate();
-  }
-
   static navigationOptions = {
     header: null
   };
 
   render() {
-    console.log("loaded", this.props.userLoaded)
     return (
       <>
-        {!this.props.userLoaded && <Login {...this.props} />}
-        {this.props.userLoaded  && <Home match={this.props.match}/>}
+        {this.props.userLoaded === false && <Login {...this.props} />}
+        {this.props.userLoaded === true && (
+          <Home
+            sesionOff={this.props.sesionOff}
+            getliveData={this.props.getliveData}
+            match={this.props.match}
+            timer={this.props.timer}
+          />
+        )}
       </>
     );
   }
@@ -40,7 +42,8 @@ class DualComponent extends Component {
 const mapStateToProps = state => ({
   userLoaded: state.init.loaded,
   loading: state.init.loading,
-  match: state.init.match
+  match: state.init.match,
+  timer: state.init.timer
 });
 const mapDispatchToProps = dispatch => ({
   login: (values, navigation, callback) => {
@@ -49,7 +52,8 @@ const mapDispatchToProps = dispatch => ({
   register: (values, navigation, callback) =>
     dispatch(register(values, navigation, callback)),
   loaded: () => dispatch(loaded()),
-  getliveData: ()=>dispatch(getliveData())
+  getliveData: () => dispatch(getliveData()),
+  sesionOff: () => dispatch(sesionOff())
 });
 
 export default connect(

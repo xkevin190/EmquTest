@@ -15,7 +15,8 @@ import {
   Text,
   View
 } from "native-base";
-import { StyleSheet, AsyncStorage, Image } from "react-native";
+import { StyleSheet, AsyncStorage, Image, BackHandler } from "react-native";
+import Menu, { MenuItem, MenuDivider } from "react-native-material-menu";
 import { banderas, noPhoto, data } from "../state/banderas";
 
 export default class Home extends Component {
@@ -25,6 +26,18 @@ export default class Home extends Component {
       match: []
     };
   }
+
+  setMenuRef = ref => {
+    this._menu = ref;
+  };
+
+  hideMenu = () => {
+    this._menu.hide();
+  };
+
+  showMenu = () => {
+    this._menu.show();
+  };
 
   getResult = match => {
     const result = match.score.split(" ");
@@ -37,12 +50,18 @@ export default class Home extends Component {
 
   componentDidMount = () => {
     this.getLocalStorage();
+    if (!this.props.timer) {
+      this.props.getliveData();
+    }
   };
 
   getLocalStorage = () => {
     AsyncStorage.getItem("match", (err, result) => {
-      console.log("asdasd", JSON.parse(result));
-      this.setState({ match: JSON.parse(result) });
+      if (result !== null) {
+        this.setState({ match: JSON.parse(result) });
+      } else {
+        this.setState({ match: [] });
+      }
     });
   };
 
@@ -66,6 +85,9 @@ export default class Home extends Component {
   };
 
   getGroups = values => {
+    if (!values) {
+      return [];
+    }
     const arrayGroup = [];
     values.map(match => {
       const result = arrayGroup.find(
@@ -81,13 +103,17 @@ export default class Home extends Component {
     });
   };
 
+  closeSesion = () => {
+    console.log("se ejecutowewqeqweqweqweqw");
+    this.hideMenu();
+    this.props.sesionOff();
+  };
+
   render() {
     const matchs =
       this.props.match.length === 0 ? this.state.match : this.props.match;
-
     const groups = this.getGroups(matchs);
 
-    console.log("MarditaSeaaa", groups);
     return (
       <Container>
         <Header style={styles.Header}>
@@ -99,7 +125,24 @@ export default class Home extends Component {
           <Body>
             <Title style={styles.colorText}>Copa América</Title>
           </Body>
-          <Right />
+          <Right>
+            <Menu
+              ref={this.setMenuRef}
+              button={
+                <Button onPress={this.showMenu} transparent>
+                  <Icon style={styles.colorText} name="more" />
+                </Button>
+              }
+            >
+              <MenuItem
+                onPress={() => {
+                  this.closeSesion();
+                }}
+              >
+                Cerrar sesión
+              </MenuItem>
+            </Menu>
+          </Right>
         </Header>
         <Content>
           <Tabs

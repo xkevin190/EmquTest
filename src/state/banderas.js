@@ -12,6 +12,9 @@ export const banderas = {
   Colombia: { url: require("../utils/img/colombia.png") }
 };
 
+export const logo = {
+  url: require("../utils/img/logo.jpg")
+};
 export const data = {
   match: [
     {

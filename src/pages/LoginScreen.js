@@ -6,12 +6,13 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  ToastAndroid
+  ToastAndroid,
+  Image
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { AsyncStorage } from "react-native";
-import { banderas, noPhoto, data } from "../state/banderas";
+import { banderas, noPhoto, data, logo } from "../state/banderas";
 
 const initialValues = {
   username: "",
@@ -29,7 +30,7 @@ export default class Equilibrio extends Component {
 
   componentDidMount() {
     this.props.loaded();
-    // this.setLocalStorage();
+    //this.setLocalStorage();
   }
 
   handleTest = async () => {
@@ -108,8 +109,8 @@ export default class Equilibrio extends Component {
       });
     } else {
       validationSchema = yup.object().shape({
-        username: yup.string().required(),
-        password: yup.string().required()
+        username: yup.string().required("Este campo es requerido"),
+        password: yup.string().required("Este campo es requerido")
       });
     }
 
@@ -127,17 +128,8 @@ export default class Equilibrio extends Component {
                 paddingBottom: 40
               }}
             >
-              <View>
-                <Text
-                  style={{
-                    fontSize: 65,
-                    paddingBottom: 40,
-                    paddingTop: 15,
-                    color: "#004d40"
-                  }}
-                >
-                  S I P F
-                </Text>
+              <View style={{ marginTop: 30 }}>
+                <Image source={logo.url} />
               </View>
               <View style={{ width: "90%" }}>
                 <InputField
@@ -157,37 +149,12 @@ export default class Equilibrio extends Component {
                   secureTextEntry
                 />
               </View>
-              {this.state.view === "register" && (
-                <View style={{ display: "flex", flexDirection: "row" }}>
-                  <Button
-                    title="BACK"
-                    type="secondary"
-                    handleSubmit={() => {
-                      this.setState({ view: "login" });
-                    }}
-                  />
-
-                  <Button
-                    title="SAVE"
-                    type="primary"
-                    handleSubmit={handleSubmit}
-                  />
-                </View>
-              )}
 
               {this.state.view === "login" && (
-                <View style={{ display: "flex", flexDirection: "row" }}>
-                  <Button
-                    title="REGISTRAR"
-                    type="primary"
-                    handleSubmit={() => {
-                      this.setState({ view: "register" });
-                    }}
-                  />
-
+                <View style={{ position: "relative", left: "30%" }}>
                   <Button
                     title="LOGIN"
-                    type="primary"
+                    type="other"
                     handleSubmit={handleSubmit}
                   />
                 </View>

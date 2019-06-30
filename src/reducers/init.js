@@ -13,8 +13,8 @@ setList = (state, node, payload) => {
 resetAll = (state, node) => state.set(node, Map());
 
 const InitialState = {
-  loaded: false,
-  loading: false,
+  loaded: undefined,
+  loading: undefined,
   match:[]
 };
 
@@ -26,6 +26,10 @@ const test = (state = InitialState, action) => {
 
     case "LIVE_MATCH": {
       return { ...state, match: action.payload };
+    }
+
+    case "TIMER":{
+      return {...state, timer:action.payload}
     }
 
     default:

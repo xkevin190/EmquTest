@@ -2,6 +2,10 @@ import { AsyncStorage } from "react-native";
 import axios from "axios";
 
 const urlLive = `https://livescore-api.com/api-client/scores/live.json?key=ykBg0rnFwIS6pynm&secret=yTkQJWmbgo397jzGDbXECkk83dfsLDOk&country=187`;
+const getLoaded = async () => {
+  const result = await AsyncStorage.getItem("loaded");
+  return result;
+};
 
 export const loaded = () => {
   return {
@@ -18,18 +22,14 @@ export const loading = () => {
 export const login = (values, cb) => async dispatch => {
   const res = await AsyncStorage.getItem("user");
   const result = JSON.parse(res);
-  console.log(values);
-  console.log(result);
-  if (
-    result.username === values.username &&
-    result.password === values.password
-  ) {
+  if (values.username === "admin" && values.password === "admin") {
+    AsyncStorage.setItem("loaded", "1");
     dispatch({
       type: "VERIFYING",
       payload: { loaded: true }
     });
   } else {
-    cb("incorrect username or password");
+    cb("usuario o clave incorrecta");
     dispatch({
       type: "VERIFYING",
       payload: { loaded: false }
@@ -46,12 +46,35 @@ export const register = (values, cb) => async dispatch => {
   }
 };
 
+export const verifyLoaded = () => async dispatch => {
+  const res = await AsyncStorage.getItem("loaded");
+  if (res) {
+    dispatch({
+      type: "VERIFYING",
+      payload: { loaded: true }
+    });
+  } else {
+    dispatch({
+      type: "VERIFYING",
+      payload: { loaded: false }
+    });
+  }
+};
+
+export const sesionOff = () => async dispatch => {
+  await AsyncStorage.removeItem("loaded");
+  dispatch({
+    type: "VERIFYING",
+    payload: { loaded: false }
+  });
+};
+
 verifyStorage = async matchs => {
   const res = await AsyncStorage.getItem("match");
   const parse = JSON.parse(res);
-  if (matchs.lenth === 0) {
-    console.log("entro en el 0");
-    return parse;
+
+  if (matchs.length === 0) {
+    return parse === null ? [] : parse;
   }
   matchs.map(match => {
     if (parse) {
@@ -70,18 +93,27 @@ verifyStorage = async matchs => {
 };
 
 export const getliveData = () => dispatch => {
-  setInterval(() => {
-    axios
-      .get(urlLive)
-      .then(async res => {
-        const result = await this.verifyStorage(res.data.data.match);
-        dispatch({
-          type: "LIVE_MATCH",
-          payload: result
-        });
-      })
-      .catch(err => {
-        console.log(err);
+  AsyncStorage.getItem("loaded", (err, result) => {
+    const interval = setInterval(() => getLiveInterval(dispatch), 10000);
+    dispatch({
+      type: "TIMER",
+      payload: interval
+    });
+  });
+};
+
+const getLiveInterval = dispatch => {
+  axios
+    .get(urlLive)
+    .then(async res => {
+      const result = await this.verifyStorage(res.data.data.match);
+      console.log("en el result", result);
+      dispatch({
+        type: "LIVE_MATCH",
+        payload: result
       });
-  }, 20000);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
