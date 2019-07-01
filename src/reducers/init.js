@@ -15,7 +15,7 @@ resetAll = (state, node) => state.set(node, Map());
 const InitialState = {
   loaded: undefined,
   loading: undefined,
-  match:[]
+  match: []
 };
 
 const test = (state = InitialState, action) => {
@@ -25,11 +25,12 @@ const test = (state = InitialState, action) => {
     }
 
     case "LIVE_MATCH": {
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!live!!!!!!!!!!!!! ");
       return { ...state, match: action.payload };
     }
 
-    case "TIMER":{
-      return {...state, timer:action.payload}
+    case "TIMER": {
+      return { ...state, timer: action.payload };
     }
 
     default:

@@ -91,13 +91,14 @@ export default class Home extends Component {
     const arrayGroup = [];
     values.map(match => {
       const result = arrayGroup.find(
-        group => group === this.getFecha(match.date)
+        group => this.getFecha(group) === this.getFecha(match.date)
       );
       if (!result) {
         arrayGroup.push(match.date);
       }
     });
 
+    console.log("arrayGroups", arrayGroup);
     return arrayGroup.sort((a, b) => {
       return new Date(b) - new Date(a);
     });

@@ -2,6 +2,8 @@ import { AsyncStorage } from "react-native";
 import axios from "axios";
 
 const urlLive = `https://livescore-api.com/api-client/scores/live.json?key=ykBg0rnFwIS6pynm&secret=yTkQJWmbgo397jzGDbXECkk83dfsLDOk&country=187`;
+//const urlLive = `https://livescore-api.com/api-client/scores/live.json?key=ykBg0rnFwIS6pynm&secret=yTkQJWmbgo397jzGDbXECkk83dfsLDOk`;
+
 const getLoaded = async () => {
   const result = await AsyncStorage.getItem("loaded");
   return result;
@@ -71,10 +73,10 @@ export const sesionOff = () => async dispatch => {
 
 verifyStorage = async matchs => {
   const res = await AsyncStorage.getItem("match");
-  const parse = JSON.parse(res);
+  const parse = JSON.parse(res) === null ? [] : JSON.parse(res);
 
   if (matchs.length === 0) {
-    return parse === null ? [] : parse;
+    return parse;
   }
   matchs.map(match => {
     if (parse) {
@@ -87,33 +89,32 @@ verifyStorage = async matchs => {
     }
   });
 
-  await AsyncStorage.setItem("match", JSON.stringify(parse));
-
+  AsyncStorage.setItem("match", JSON.stringify(parse));
   return parse;
 };
 
 export const getliveData = () => dispatch => {
-  AsyncStorage.getItem("loaded", (err, result) => {
-    const interval = setInterval(() => getLiveInterval(dispatch), 10000);
+  const timer = AsyncStorage.getItem("loaded", (err, result) => {
+    setInterval(
+      () =>
+        axios
+          .get(urlLive)
+          .then(async res => {
+            const result = await this.verifyStorage(res.data.data.match);
+            dispatch({
+              type: "LIVE_MATCH",
+              payload: result
+            });
+          })
+          .catch(err => {
+            console.log(err);
+          }),
+
+      10000
+    );
     dispatch({
       type: "TIMER",
-      payload: interval
+      payload: timer
     });
   });
-};
-
-const getLiveInterval = dispatch => {
-  axios
-    .get(urlLive)
-    .then(async res => {
-      const result = await this.verifyStorage(res.data.data.match);
-      console.log("en el result", result);
-      dispatch({
-        type: "LIVE_MATCH",
-        payload: result
-      });
-    })
-    .catch(err => {
-      console.log(err);
-    });
 };
